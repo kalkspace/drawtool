@@ -66,6 +66,7 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
 
   const appUrl = new URL(`https://${event.headers.host}/`);
   appUrl.pathname = "/";
+  appUrl.search = "?x";
   appUrl.hash = `#s=${encodedProject}`;
 
   const userAgent = getHeaderIgnoreCase(event.headers, "User-Agent");
