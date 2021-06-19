@@ -10,6 +10,12 @@ to = "/.netlify/functions/export"
 status = 200
 force = true
 
+[[redirects]]
+from = "/share"
+to = "/.netlify/functions/share"
+status = 200
+force = true
+
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["canvas", "lzma"]

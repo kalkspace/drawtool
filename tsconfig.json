@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "types/json-url.d.ts", "functions/export"]
+  "include": ["src", "types/json-url.d.ts", "functions"]
 }

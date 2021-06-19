@@ -8,7 +8,8 @@ import {
 } from "@excalidraw/excalidraw/types/element/types";
 import { AppState } from "@excalidraw/excalidraw/types/types";
 
-export const STATIC_DATA_MARKER = "#s=";
+const STATIC_DATA_KEY = "s";
+const STATIC_DATA_MARKER = `#${STATIC_DATA_KEY}=`;
 
 const uiProps: React.ComponentProps<typeof Excalidraw> = {
   onExportToBackend: (elements, appState, canvas) =>
@@ -44,7 +45,10 @@ const exportToBackend = async (
   const encodedProject = await exportToStaticUrl(elements);
 
   const url = new URL(window.location.href);
-  url.hash = `${STATIC_DATA_MARKER}${encodedProject}`;
+  url.pathname = "/share";
+  const params = new URLSearchParams();
+  params.set(STATIC_DATA_KEY, encodedProject);
+  url.search = params.toString();
   const urlString = url.toString();
   await navigator.clipboard.writeText(urlString);
 
