@@ -4,9 +4,9 @@ const getHeaderIgnoreCase = (
   headers: Record<string, string | undefined>,
   name: string
 ) =>
-  (Object.entries(headers).find(
+  Object.entries(headers).find(
     ([key]) => key.toLowerCase() === name.toLowerCase()
-  ) ?? [])?.[1];
+  )?.[1];
 
 const crawlerRegex = new RegExp(
   "(Discourse Forum Onebox|baiduspider|twitterbot|facebookexternalhit|facebot|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|SocialFlow|Net::Curl::Simple|Snipcart|Googlebot|outbrain|pinterestbot|pinterest/0|slackbot|vkShare|W3C_Validator|redditbot|Mediapartners-Google|AdsBot-Google|parsely|DuckDuckBot|whatsapp|Hatena|Screaming Frog SEO Spider|bingbot|Sajaribot|DashLinkPreviews|Discordbot|RankSonicBot|lyticsbot|YandexBot/|YandexWebmaster/|naytev-url-scraper|newspicksbot/|Swiftbot/|mattermost|Applebot/|snapchat|viber|proximic|iframely/|upday|Google Web Preview)"

@@ -77,7 +77,7 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
 
   let elements: NonDeletedExcalidrawElement[];
   try {
-    elements = (await loadFromStaticUrl(encodedProject)).elements;
+    ({ elements } = await loadFromStaticUrl(encodedProject));
   } catch (e) {
     return {
       statusCode: 400,
