@@ -1,6 +1,6 @@
 [build]
   functions = "functions"
-  command = "#yarn build"
+  command = "yarn build"
   publish = "build"
   environment = { LD_LIBRARY_PATH = "" }
 
