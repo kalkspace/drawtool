@@ -11,7 +11,7 @@ export enum SupportedVersion {
 export interface ExportData {
   version: SupportedVersion;
   elements: readonly NonDeletedExcalidrawElement[];
-  name: string;
+  name?: string;
 }
 
 export interface ImportData extends ExportData {

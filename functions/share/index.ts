@@ -1,5 +1,7 @@
 import { Handler, HandlerResponse } from "@netlify/functions";
 
+import { loadFromStaticUrl } from "../../src/static-urls";
+
 const getHeaderIgnoreCase = (
   headers: Record<string, string | undefined>,
   name: string
@@ -19,13 +21,14 @@ interface TemplateData {
     width?: number;
     height?: number;
   };
+  name?: string;
 }
 
-const pageTemplate = ({ url, image }: TemplateData): string => `
+const pageTemplate = ({ url, image, name }: TemplateData): string => `
 <!DOCTYPE>
 <html>
 <head>
-  <meta property="og:title" content="KalkSpace Draw Tool" />
+  <meta property="og:title" content="${name ?? "KalkSpace Draw Tool"}" />
   <meta property="og:description" content="Zeichnung erstellt mit draw.kalk.space" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="${url}" />
@@ -76,6 +79,16 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
     };
   }
 
+  let name: string | undefined;
+  try {
+    ({ name } = await loadFromStaticUrl(encodedProject));
+  } catch (e) {
+    return {
+      statusCode: 400,
+      body: e.message,
+    };
+  }
+
   const imageUrl = new URL(`https://${event.headers.host}/`);
   imageUrl.pathname = "/export";
   const params = new URLSearchParams();
@@ -88,6 +101,7 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
     image: {
       url: imageUrl.toString(),
     },
+    name,
   };
   const page = pageTemplate(data);
 
