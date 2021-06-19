@@ -42,11 +42,15 @@ const imageTypeToMime: Record<ImageType, string> = {
 interface QueryParams {
   s?: string;
   type?: ImageType;
+  scale?: string;
 }
 
 export const handler: Handler = async (event): Promise<HandlerResponse> => {
-  const { s: compressed, type: imageType = ImageType.PNG } =
-    event.queryStringParameters as unknown as QueryParams;
+  const {
+    s: compressed,
+    type: imageType = ImageType.PNG,
+    scale: scaleStr,
+  }: QueryParams = event.queryStringParameters ?? {};
   if (!compressed) {
     return {
       statusCode: 400,
@@ -64,6 +68,14 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
   }
 
   const mimeType = imageTypeToMime[imageType];
+
+  let scale = scaleStr ? Number(scaleStr) : DEFAULT_SCALE;
+  if (Number.isNaN(scale) || scale <= 0) {
+    return {
+      statusCode: 400,
+      body: `Invalid scale value`,
+    };
+  }
 
   const { elements, version }: ImportData = await codec.decompress(compressed);
   if (!elements) {
@@ -95,7 +107,11 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
   const blob = await exportToBlob({
     elements,
     mimeType,
-    getDimensions: (width, height) => ({ width, height, scale: DEFAULT_SCALE }),
+    getDimensions: (width, height) => ({
+      width: width * scale,
+      height: height * scale,
+      scale,
+    }),
   });
   if (blob === null) {
     return {
