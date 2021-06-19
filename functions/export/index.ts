@@ -3,7 +3,7 @@ import "./jsdom";
 import { Handler, HandlerResponse } from "@netlify/functions";
 import jsonUrlMakeCodec from "json-url";
 import { registerFont } from "canvas";
-import { exportToBlob } from "@excalidraw/excalidraw";
+import { exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
 
 import { ImportData, SupportedVersion } from "../../src/static-urls";
 
@@ -27,14 +27,43 @@ const blobToBytes = async (blob: Blob): Promise<Buffer> => {
   return Buffer.from(buf);
 };
 
+enum ImageType {
+  PNG = "png",
+  JPG = "jpg",
+  SVG = "svg",
+}
+
+const imageTypeToMime: Record<ImageType, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  svg: "image/svg+xml",
+};
+
+interface QueryParams {
+  s?: string;
+  type?: ImageType;
+}
+
 export const handler: Handler = async (event): Promise<HandlerResponse> => {
-  const { s: compressed } = event.queryStringParameters!;
+  const { s: compressed, type: imageType = ImageType.PNG } =
+    event.queryStringParameters as unknown as QueryParams;
   if (!compressed) {
     return {
       statusCode: 400,
       body: "Expected s parameter with compressed image data",
     };
   }
+
+  if (!Object.values(ImageType).includes(imageType)) {
+    return {
+      statusCode: 400,
+      body: `Invalid image type. Supports one of: ${Object.values(
+        ImageType
+      ).join(", ")}`,
+    };
+  }
+
+  const mimeType = imageTypeToMime[imageType];
 
   const { elements, version }: ImportData = await codec.decompress(compressed);
   if (!elements) {
@@ -52,9 +81,20 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
     };
   }
 
+  if (imageType === ImageType.SVG) {
+    const svg = exportToSvg({ elements });
+    return {
+      statusCode: 200,
+      body: `<?xml version="1.0" encoding="UTF-8"?> ${svg.outerHTML}`,
+      headers: {
+        "Content-Type": mimeType,
+      },
+    };
+  }
+
   const blob = await exportToBlob({
     elements,
-    mimeType: "image/png",
+    mimeType,
     getDimensions: (width, height) => ({ width, height, scale: DEFAULT_SCALE }),
   });
   if (blob === null) {
@@ -68,7 +108,7 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
   return {
     statusCode: 200,
     headers: {
-      "Content-Type": "image/png",
+      "Content-Type": mimeType,
     },
     isBase64Encoded: true,
     body: buf.toString("base64"),
