@@ -11,11 +11,6 @@ import { AppState } from "@excalidraw/excalidraw/types/types";
 const STATIC_DATA_KEY = "s";
 const STATIC_DATA_MARKER = `#${STATIC_DATA_KEY}=`;
 
-const uiProps: React.ComponentProps<typeof Excalidraw> = {
-  onExportToBackend: (elements, appState, canvas) =>
-    console.log("export to backend", { elements, appState, canvas }),
-};
-
 interface InitialData {
   elements?: ExcalidrawElement[];
   appState?: Partial<AppState>;
@@ -82,7 +77,6 @@ function App() {
 
   return (
     <Excalidraw
-      {...uiProps}
       initialData={initialData}
       onExportToBackend={(elements, appState) =>
         exportToBackend(elements, appState)
