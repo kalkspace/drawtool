@@ -1,0 +1,20 @@
+[build]
+  functions = "functions"
+  command = "#yarn build"
+  publish = "build"
+  environment = { LD_LIBRARY_PATH = "" }
+
+[[redirects]]
+from = "/export"
+to = "/.netlify/functions/export"
+status = 200
+force = true
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["canvas", "lzma"]
+  included_files = [
+    "./functions/export/xhr-sync-worker.js",
+    "./functions/export/lib/*",
+    "./functions/export/fonts/*",
+  ]
