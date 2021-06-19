@@ -1,6 +1,6 @@
 [build]
   functions = "functions"
-  command = "yarn build"
+  command = "yarn build && cp functions/export/lib/* node_modules/canvas/build/Release/"
   publish = "build"
   environment = { LD_LIBRARY_PATH = "" }
 
