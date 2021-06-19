@@ -24,8 +24,10 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "copy:excalidraw:dev": "cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets-dev public/static/excalidraw/",
+    "copy:excalidraw:prod": "cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets public/static/excalidraw/",
+    "start": "yarn copy:excalidraw:dev && react-scripts start",
+    "build": "yarn copy:excalidraw:prod && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
