@@ -11,6 +11,7 @@ export enum SupportedVersion {
 export interface ExportData {
   version: SupportedVersion;
   elements: readonly NonDeletedExcalidrawElement[];
+  name: string;
 }
 
 export interface ImportData extends ExportData {
@@ -38,11 +39,13 @@ export const loadFromStaticUrl = async (
 };
 
 export const exportToStaticUrl = async (
-  elements: readonly NonDeletedExcalidrawElement[]
+  elements: readonly NonDeletedExcalidrawElement[],
+  name: string
 ): Promise<string> => {
   const data: ExportData = {
     version: SupportedVersion.VERSION_2,
     elements,
+    name,
   };
 
   return await codec.compress(data);

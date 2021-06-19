@@ -18,7 +18,7 @@ const uiProps: React.ComponentProps<typeof Excalidraw> = {
 
 interface InitialData {
   elements?: ExcalidrawElement[];
-  appState?: AppState;
+  appState?: Partial<AppState>;
 }
 
 const initFromUrl = async (): Promise<InitialData> => {
@@ -31,18 +31,22 @@ const initFromUrl = async (): Promise<InitialData> => {
     return {};
   }
 
-  const { elements } = await loadFromStaticUrl(encodedProject);
+  const { elements, name } = await loadFromStaticUrl(encodedProject);
   window.location.hash = "";
 
   return {
     elements,
+    appState: {
+      name,
+    },
   };
 };
 
 const exportToBackend = async (
-  elements: readonly NonDeletedExcalidrawElement[]
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState
 ) => {
-  const encodedProject = await exportToStaticUrl(elements);
+  const encodedProject = await exportToStaticUrl(elements, appState.name);
 
   const url = new URL(window.location.href);
   url.pathname = "/share";
@@ -80,7 +84,9 @@ function App() {
     <Excalidraw
       {...uiProps}
       initialData={initialData}
-      onExportToBackend={(elements) => exportToBackend(elements)}
+      onExportToBackend={(elements, appState) =>
+        exportToBackend(elements, appState)
+      }
     />
   );
 }
