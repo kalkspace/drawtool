@@ -1,6 +1,6 @@
 # KalkSpace Draw Tool
 
-This tools is a thin layer on top of the excellent [Excalidraw](https://github.com/excalidraw/excalidraw) project.
+This tool is a thin layer on top of the excellent [Excalidraw](https://github.com/excalidraw/excalidraw) project.
 
 It helps us collaborate on drawings.
 
