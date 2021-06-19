@@ -1,13 +1,11 @@
 import "./jsdom";
 
 import { Handler, HandlerResponse } from "@netlify/functions";
-import jsonUrlMakeCodec from "json-url";
 import { registerFont } from "canvas";
 import { exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
+import { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 
-import { ImportData, SupportedVersion } from "../../src/static-urls";
-
-const codec = jsonUrlMakeCodec("lzma");
+import { loadFromStaticUrl } from "../../src/static-urls";
 
 registerFont(require.resolve("./fonts/Cascadia.ttf"), { family: "Cascadia" });
 registerFont(require.resolve("./fonts/FG_Virgil.ttf"), { family: "Virgil" });
@@ -47,11 +45,11 @@ interface QueryParams {
 
 export const handler: Handler = async (event): Promise<HandlerResponse> => {
   const {
-    s: compressed,
+    s: encodedProject,
     type: imageType = ImageType.PNG,
     scale: scaleStr,
   }: QueryParams = event.queryStringParameters ?? {};
-  if (!compressed) {
+  if (!encodedProject) {
     return {
       statusCode: 400,
       body: "Expected s parameter with compressed image data",
@@ -77,19 +75,13 @@ export const handler: Handler = async (event): Promise<HandlerResponse> => {
     };
   }
 
-  const { elements, version }: ImportData = await codec.decompress(compressed);
-  if (!elements) {
+  let elements: NonDeletedExcalidrawElement[];
+  try {
+    elements = (await loadFromStaticUrl(encodedProject)).elements;
+  } catch (e) {
     return {
       statusCode: 400,
-      body: "Missing elements from serialized image",
-    };
-  }
-  if (!Object.values(SupportedVersion).includes(version)) {
-    return {
-      statusCode: 400,
-      body: `Unsupported project version. This build supports: ${Object.values(
-        SupportedVersion
-      ).join(", ")}`,
+      body: e.message,
     };
   }
 

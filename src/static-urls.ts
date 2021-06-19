@@ -35,6 +35,10 @@ export const loadFromStaticUrl = async (
       ).join(", ")}`
     );
   }
+  if (!data.elements) {
+    throw new Error("Missing elements from serialized image");
+  }
+
   return data;
 };
 
