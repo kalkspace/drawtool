@@ -7,6 +7,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/excalidraw/types/element/types";
 import { AppState } from "@excalidraw/excalidraw/types/types";
+import { Wrapper as CollabWrapper } from "./collab/collab-wrapper";
 
 const STATIC_DATA_KEY = "s";
 const STATIC_DATA_MARKER = `#${STATIC_DATA_KEY}=`;
